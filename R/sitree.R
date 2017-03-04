@@ -14,10 +14,11 @@ sitree <- function(tree.df,
   if (!is.list(functions)) stop ('functions should be a list')
   if (!is.data.frame(tree.df)) stop ('tree.df should be a data.frame')
   if ( !(is.data.frame(stand.df) | is.list(stand.df) ) ) {
-    stop ('stand.df should be a data.frame')
+    stop ('stand.df should be a data.frame or a list')
   }
   ## check that all functions are defined
-  if (!all(c('fn.growth', 'fn.mort', 'fn.recr', 'fn.management', 'fn.modif') %in%
+  if (!all(c('fn.growth', 'fn.mort', 'fn.recr', 'fn.management', 'fn.modif',
+             'fn.tree.removal', 'fn.prep.common.vars') %in%
            names(functions))){
     stop ('There are some missing definitions for the functions. Please read sitree man')
   }
@@ -68,8 +69,11 @@ sitree <- function(tree.df,
   rm(trl, tr.rest)
 
 ### stand data, a data.frame or list
-  fl <- as.list(stand.df)
-  
+    fl <- as.list(stand.df)
+    ## create the management data frame
+    fl$management <- data.frame(matrix(NA, ncol = n.periods,
+                                       nrow = length(fl$ustandID)))
+    names(fl$management) <- paste0("t", 1:n.periods)
 
 ######################################
   ## VARS REQUIRED
@@ -172,44 +176,51 @@ sitree <- function(tree.df,
     
     if (print.comments) print('Passed Exter mod')
     
-    ## Management - return the management of the different plots              
-    management <- do.call(functions$fn.management,#.scen,
-                          args = list(
-                            tr = tr,
-                            fl = fl,
-                            common.vars = common.vars,
-                            this.period = this.period,
-                            next.period = next.period,
-                            i.period = i.period,
-                            mng.options    = mng.options,
-                            ...)
-                          )
-    
-    if (print.comments) print('Passed management')
+    ## Management - return the management of the different plots
+    if ( !is.null(functions$fn.management)){
+      management <- do.call(functions$fn.management,#.scen,
+                            args = list(
+                              tr = tr,
+                              fl = fl,
+                              common.vars = common.vars,
+                              this.period = this.period,
+                              next.period = next.period,
+                              i.period = i.period,
+                              mng.options    = mng.options,
+                              ...)
+                            )
+      
+      if (print.comments) print('Passed management')
+      
+      ## save that certain stands have been managed in the management table,
+      ## not sure it has to be done here, but if possible we should move it down
+      ## this was done before inside the fn.management function--- does not work
+      ## when working on parallel
+      ## CHECK IF POSSIBLE
+      
+      fl$management[, next.period] <- management$management
+      
+      removed <- do.call(
+        functions$fn.tree.removal,
+        args = list(
+          tr = tr,
+          fl = fl, 
+          common.vars = common.vars,
+          management = management,
+          this.period = this.period,
+          next.period = next.period,
+          i.period    = i.period,
+          mng.options = mng.options,
+          ...)
+      )
+      if (print.comments) print(paste0('sum removed ', sum(removed)))
+      if (print.comments) print('Passed removed')
+    } else {
+      ## we don't remove trees if there is no management
+      management <- rep(NA, length(fl$ustandID))
+      removed <- rep(FALSE, nrow(tr$data$dbh.mm))     
+    }
 
-    ## save that certain stands have been managed in the management table,
-    ## not sure it has to be done here, but if possible we should move it down
-    ## this was done before inside the fn.management function--- does not work
-    ## when working on parallel
-    ## CHECK IF POSSIBLE
-   
-    fl$management[, next.period] <- management$management
-
-    removed <- do.call(
-      functions$fn.tree.removal,
-      args = list(
-        tr = tr,
-        fl = fl, 
-        common.vars = common.vars,
-        management = management,
-        this.period = this.period,
-        next.period = next.period,
-        i.period    = i.period,
-        mng.options = mng.options,
-        ...)
-    )
-    if (print.comments) print(paste0('sum removed ', sum(removed)))
-    if (print.comments) print('Passed removed')
     
     ## GROWTH
     growth   <- do.call(
@@ -260,7 +271,8 @@ sitree <- function(tree.df,
     )
     
     if (print.comments) print('Passed ingrowth')
-    
+
+        
     ## book keeping
     i.removed <- tr$data$treeid[removed]
     
@@ -283,36 +295,37 @@ sitree <- function(tree.df,
     ## DEAD TREES
     i.dead.trees <- mort & !removed ## not sure if this is neccessary
     ## extract
-    new.dead.trees <-  tr$extractTrees(which(i.dead.trees))
-    ## create dead trees class object
-    new.dead.trees <- trListDead$new(
-      data = new.dead.trees,
-      last.measurement = cbind(
-        do.call("dead.trees.growth"
-              , args = list(
+    if (sum(i.dead.trees) > 0) {
+      new.dead.trees <-  tr$extractTrees(which(i.dead.trees))
+    
+      ## create dead trees class object
+      new.dead.trees <- trListDead$new(
+        data = new.dead.trees,
+        last.measurement = cbind(
+          do.call("dead.trees.growth"
+                , args = list(
                   dt     = new.dead.trees,
                   growth = growth,
                   mort   = i.dead.trees,
                   this.period = this.period)
-                ),
-        found.dead = next.period
-      ),
-      nperiods = tr$nperiods
-    )
+                  ),
+          found.dead = next.period
+        ),
+        nperiods = tr$nperiods
+      )
+       
+      ## remove last measurement --- we could probably skip this step if
+      ## we change the code slightly, if only alived trees are grown
+      new.dead.trees$remove.next.period(next.period = next.period)
+      ## If this is the first period create the dead.trees object, if not
+      ## add the new dead trees to the dead.trees object
+      if (i.period == 0){
+        dead.trees <- new.dead.trees
+      } else{
+        dead.trees$addTrees(new.dead.trees)
+      }
+    } else if (i.period == 0) dead.trees <- new.dead.trees
     if (print.comments) print("Dead trees applied")
-
-    ## remove last measurement --- we could probably skip this step if
-    ## we change the code slightly, if only alived trees are grown
-    new.dead.trees$remove.next.period(next.period = next.period)
-    ## If this is the first period create the dead.trees object, if not
-    ## add the new dead trees to the dead.trees object
-    if (i.period == 0){
-      dead.trees <- new.dead.trees
-    } else{
-      dead.trees$addTrees(new.dead.trees)
-    }
-
-
     
     ## REMOVED TREES
     ## extract
@@ -346,9 +359,9 @@ sitree <- function(tree.df,
       }
     }
     if (print.comments) print("removed trees applied")
-    
+
     ## Apply ingrowth
-    tr$addTrees(ingrowth)
+    if (length(ingrowth$treeid) > 0) tr$addTrees(ingrowth)
     
     ## remove superfluous files
     rm(growth, mort, new.dead.trees, management, removed)
@@ -356,7 +369,7 @@ sitree <- function(tree.df,
     ## End of the period-loop 
   }
   if (print.comments) print('---- Fixing last period')
-  
+
   ## For the last period calculate some of the common variables (height)
   ## need to be recalculated, so everything is updated for the last period
   i.period <- tr$nperiods 
@@ -378,8 +391,7 @@ sitree <- function(tree.df,
                                     )
                                     )
   
-  common.vars <- prep.common.vars$res
-  fl <- prep.common.vars$fl
+   fl <- prep.common.vars$fl
 
  
   
@@ -391,8 +403,11 @@ sitree <- function(tree.df,
                               ),
                  dead = dead.trees,
                  removed = removed.trees,
-                 fl = fl)
+                 plot.data = fl)
             )
   
 }
+
 ## reassignInPackage("sitree", "sitree", sitree)
+
+## reassignInPackage("recr.BBG2008", "sitree", recr.BBG2008)

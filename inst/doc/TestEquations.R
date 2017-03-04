@@ -112,6 +112,8 @@ square$sides
  new.dead.trees$last.measurement$found.dead
  
 
+
+
 ## ------------------------------------------------------------------------
  
 set.seed(2017)
@@ -143,6 +145,9 @@ res <- sitree (tree.df   = tr,
                 per.vol.harv = 0.83
                 )
 
+
+
+
 ## ------------------------------------------------------------------------
 require(lattice)
 
@@ -158,11 +163,11 @@ histogram( ~ t | period, data = dbh.mm.short, plot.points = FALSE,
           xlab = "dbh.mm")
 
 ## ------------------------------------------------------------------------
-vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$fl$ustandID)))
+vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$ustandID)))
 names(vol) <- paste0("t", 0:5)
 for (i.period in 0:5){
     sa <- prep.common.vars.fun (
-        tr = res$live, fl= res$fl,
+        tr = res$live, fl= res$plot.data,
         i.period, this.period = paste0("t", i.period),
         common.vars = NULL, vars.required = "vuprha.m3.ha", 
         period.length = 5 )
@@ -183,7 +188,7 @@ xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
                         ylab = "standing volume in mill. m3")
 
 ## ------------------------------------------------------------------------
-vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$fl$ustandID)))
+vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$ustandID)))
 ## res$removed$data only contains the "history of the tree", but we need
 ## the dbh and height of the tree at harvest time
 names(vol) <- paste0("t", 0:5)
@@ -192,7 +197,7 @@ removed <- recover.last.measurement(res$removed)
 for (i.period in 0:5){
     sa <- prep.common.vars.fun (
         tr = res$removed,
-        fl = res$fl,
+        fl = res$plot.data,
         i.period,
         this.period = paste0("t", i.period),
         common.vars = NULL,
@@ -218,13 +223,13 @@ xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
        ylab = "harvested volume in mill. m3")
 
 ## ------------------------------------------------------------------------
-vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$fl$ustandID)))
+vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$ustandID)))
 names(vol) <- paste0("t", 0:5)
 dead <- recover.last.measurement(res$dead)
 
 for (i.period in 0:5){
     sa <- prep.common.vars.fun (
-        tr = res$dead, fl= res$fl,
+        tr = res$dead, fl= res$plot.data,
         i.period, this.period = paste0("t", i.period),
         common.vars = NULL, vars.required = "vuprha.m3.ha", 
         period.length = 5 )
@@ -250,7 +255,7 @@ xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
        ylab = "volume of dead trees in mill. m3")
 
 ## ------------------------------------------------------------------------
-age <- res$fl$stand.age.years
+age <- res$plot.data$stand.age.years
 age.short<- reshape(age, 
                     varying = paste0("t", 0:40), 
                     timevar = "period",
@@ -328,7 +333,7 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #      names(vol) <- paste0("t", 0:5)
 #      for (i.period in 0:5){
 #          sa <- prep.common.vars.fun (
-#              tr = res1$live, fl= res1$fl,
+#              tr = res1$live, fl= res1$plot.data,
 #              i.period, this.period = paste0("t", i.period),
 #              common.vars = NULL, vars.required = "vuprha.m3.ha",
 #              period.length = 5 )
@@ -373,7 +378,7 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #      names(vol) <- paste0("t", 0:5)
 #      for (i.period in 0:5){
 #          sa <- prep.common.vars.fun (
-#              tr = res1$live, fl= res1$fl,
+#              tr = res1$live, fl= res1$plot.data,
 #              i.period, this.period = paste0("t", i.period),
 #              common.vars = NULL, vars.required = "vuprha.m3.ha",
 #              period.length = 5 )
