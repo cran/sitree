@@ -50,9 +50,9 @@ square$sides
                  period.length = 5,
                  mng.options = NA,
                  print.comments = FALSE,
-                 treslag.gran = c(1, 2, 3),
-                 treslag.furu = c(10, 11, 20, 21, 29),
-                 treslag.lauv = c(30, 31),
+                 species.spruce = c(1, 2, 3),
+                 species.pine = c(10, 11, 20, 21, 29),
+                 species.harw = c(30, 31),
                  fun.final.felling = "harv.prob",
                  fun.thinning      = "thin.prob",
                  'BN2009',
@@ -63,7 +63,7 @@ square$sides
 
  ## getTrees(i, j)  -- obtains the information of the i trees, on the j periods,
  ## by default it selects all. It does not display it, it passes the value.
- ## It returns a list with elements ustandID, treeid, dbh.mm, height.dm, yrs.sim,
+ ## It returns a list with elements plot.id, treeid, dbh.mm, height.dm, yrs.sim,
  ## tree.sp
  
  get.some.trees <- res$live$getTrees(1:3, 2:5)
@@ -135,9 +135,9 @@ res <- sitree (tree.df   = tr,
                 period.length = 5,
                 mng.options = NA,
                 print.comments = FALSE,
-                treslag.gran = c(1, 2, 3),
-                treslag.furu = c(10, 11, 20, 21, 29),
-                treslag.lauv = c(30, 31),
+                species.spruce = c(1, 2, 3),
+                species.pine = c(10, 11, 20, 21, 29),
+                species.harw = c(30, 31),
                 fun.final.felling = "harv.prob",
                 fun.thinning      = "thin.prob",
                 'BN2009',
@@ -163,7 +163,7 @@ histogram( ~ t | period, data = dbh.mm.short, plot.points = FALSE,
           xlab = "dbh.mm")
 
 ## ------------------------------------------------------------------------
-vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$ustandID)))
+vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$plot.id)))
 names(vol) <- paste0("t", 0:5)
 for (i.period in 0:5){
     sa <- prep.common.vars.fun (
@@ -188,7 +188,7 @@ xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
                         ylab = "standing volume in mill. m3")
 
 ## ------------------------------------------------------------------------
-vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$ustandID)))
+vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$plot.id)))
 ## res$removed$data only contains the "history of the tree", but we need
 ## the dbh and height of the tree at harvest time
 names(vol) <- paste0("t", 0:5)
@@ -223,7 +223,7 @@ xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
        ylab = "harvested volume in mill. m3")
 
 ## ------------------------------------------------------------------------
-vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$ustandID)))
+vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$plot.id)))
 names(vol) <- paste0("t", 0:5)
 dead <- recover.last.measurement(res$dead)
 
@@ -292,7 +292,7 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
         p.functions[common.vars$spp, "b3"] * fl$SI.m[common.vars$i.stand] + 
         p.functions[common.vars$spp, "b4"] * common.vars$pr.spp.ba$spru
     mort.B <- 1- (1/(1 + exp(-logit)))
-    mort <- ifelse(mort.B >= runif(length(tr$data[["ustandID"]]), 
+    mort <- ifelse(mort.B >= runif(length(tr$data[["plot.id"]]), 
                                    0, 1), TRUE, FALSE)
     return(mort)
 }
@@ -320,9 +320,9 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                       period.length = 5,
 #                       mng.options = NA,
 #                       print.comments = FALSE,
-#                       treslag.gran = c(1, 2, 3),
-#                       treslag.furu = c(10, 11, 20, 21, 29),
-#                       treslag.lauv = c(30, 31),
+#                       species.spruce = c(1, 2, 3),
+#                       species.pine = c(10, 11, 20, 21, 29),
+#                       species.harw = c(30, 31),
 #                       fun.final.felling = "harv.prob",
 #                       fun.thinning      = "thin.prob",
 #                       'BN2009',
@@ -366,9 +366,9 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                       period.length = 5,
 #                       mng.options = NA,
 #                       print.comments = FALSE,
-#                       treslag.gran = c(1, 2, 3),
-#                       treslag.furu = c(10, 11, 20, 21, 29),
-#                       treslag.lauv = c(30, 31),
+#                       species.spruce = c(1, 2, 3),
+#                       species.pine = c(10, 11, 20, 21, 29),
+#                       species.harw = c(30, 31),
 #                       fun.final.felling = "harv.prob",
 #                       fun.thinning      = "thin.prob",
 #                       'BN2009','PBAL.m2.ha',
