@@ -9,7 +9,7 @@ sitree <- function(tree.df,
                     ... ){
   
   others <- list(...)
-  
+
   ## check that functions is a list
   if (!is.list(functions)) stop ('functions should be a list')
   if (!is.data.frame(tree.df)) stop ('tree.df should be a data.frame')
@@ -55,14 +55,20 @@ sitree <- function(tree.df,
     stop ('plot.id missing in stand.df')
   }
   tr.rest <- as.list(tree.df[, !names(tree.df) %in% names.tr])
+  ## tree species
+  ## if already a factor keep it like that, in case it has extra levels
+  ## that might be needed after
+  if (is.factor(tree.df$tree.sp)) {
+    tree.sp <- tree.df$tree.sp} else tree.sp <- factor(tree.df$tree.sp)
   trl <- list(
     plot.id  = tree.df$plot.id,
     treeid    = tree.df$treeid,
-    dbh.mm    = foo(tree.df$dbh, n.periods = n.periods ),
-    height.dm = foo(tree.df$height, n.periods = n.periods  ),
+    dbh.mm    = foo(as.integer(tree.df$dbh), n.periods = n.periods ),
+    height.dm = foo(as.integer(tree.df$height), n.periods = n.periods  ),
     yrs.sim   = rep(0, nrow(tree.df)),
-    tree.sp   = factor(tree.df$tree.sp)
+    tree.sp   = tree.sp
   )
+  rm(tree.sp)
   trl <- c(trl, tr.rest)
   tr <- trList$new(data = trl, nperiods = as.integer(n.periods))
   ## clean up
@@ -305,18 +311,19 @@ sitree <- function(tree.df,
     ## GROWTH
     ## grow dbh
     tr$data$dbh.mm[ next.period] <-
-      tr$data$dbh.mm[, this.period] + growth[, "dbh.inc.mm"]
+      tr$data$dbh.mm[, this.period] + as.integer(growth[, "dbh.inc.mm"])
     ##i.small.dbh <- tr$data$dbh.mm[ next.period] < 50
     ##tr$data$dbh.mm[ next.period] [i.small.dbh] <- 50
     
     ## grow heigth
     tr$data$height.dm[, next.period] <-
-      tr$data$height.dm[, this.period] + growth[, "hgt.inc.dm"]
+      tr$data$height.dm[, this.period] + as.integer(growth[, "hgt.inc.dm"])
    
     if (print.comments) print("Growth applied")
     
     ## DEAD TREES
     i.dead.trees <- mort & !removed ## not sure if this is neccessary
+ 
     ## extract
     if (sum(i.dead.trees) > 0) {
       new.dead.trees <-  tr$extractTrees(which(i.dead.trees))
@@ -336,18 +343,24 @@ sitree <- function(tree.df,
         ),
         nperiods = tr$nperiods
       )
-       
+      
       ## remove last measurement --- we could probably skip this step if
       ## we change the code slightly, if only alived trees are grown
       new.dead.trees$remove.next.period(next.period = next.period)
       ## If this is the first period create the dead.trees object, if not
       ## add the new dead trees to the dead.trees object
-      if (i.period == 0){
+      
+      if (i.period == 0 | !exists('dead.trees')){
+        
         dead.trees <- new.dead.trees
-      } else{
+      } else {
+       
         dead.trees$addTrees(new.dead.trees)
+       
       }
-    } else if (i.period == 0) dead.trees <- new.dead.trees
+    }
+           
+    
     if (print.comments) print("Dead trees applied")
     
     ## REMOVED TREES
@@ -391,6 +404,7 @@ sitree <- function(tree.df,
     ## remove objects
     rm(growth, mort, new.dead.trees, management, removed)
 
+    print (tr$data$dbh.mm[tr$data$treeid == 3263, ])
     ## End of the period-loop 
   }
   if (print.comments) print('---- Fixing last period')
@@ -421,6 +435,7 @@ sitree <- function(tree.df,
  
   
   if (!exists('removed.trees')) removed.trees <- NULL
+  if (!exists('dead.trees'))    dead.trees    <- NULL
   
   invisible(list(live =  recover.state(tr   = tr,
                               dead.trees    = dead.trees,

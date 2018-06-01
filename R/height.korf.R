@@ -1,5 +1,7 @@
-height.korf <- function (common.vars = common.vars, this.period = this.period,
-                         tr, dbh.inc.mm, ...) 
+height.korf <- function (common.vars,
+                         this.period,
+                         tr,
+                         dbh.inc.mm, ...) 
 {
   spp <- common.vars$spp
   height <- next.height <- rep(NA, nrow(tr$data$dbh.mm))
@@ -15,7 +17,6 @@ height.korf <- function (common.vars = common.vars, this.period = this.period,
     exp(-11.0299 * tr$data$dbh.mm[spp %in% c('birch', 'other'),this.period]^ (-0.347))
 
   ## height next.period according to korf
-  ##browser()
   next.height[spp == 'spruce'] <- 1017.27 *
     exp(-12.697 * (tr$data$dbh.mm[spp == 'spruce',this.period] +
                      dbh.inc.mm [spp == 'spruce'])^ (-0.3562))
