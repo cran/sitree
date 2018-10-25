@@ -117,7 +117,7 @@ square$sides
 ## ------------------------------------------------------------------------
  
 set.seed(2017)
-
+n.periods <- 50
 res <- sitree (tree.df   = tr,
                 stand.df  = fl,
                 functions = list(
@@ -131,7 +131,7 @@ res <- sitree (tree.df   = tr,
                     fn.modif      = NULL,
                     fn.prep.common.vars = 'prep.common.vars.fun'
                 ),
-                n.periods = 5,
+                n.periods = n.periods,
                 period.length = 5,
                 mng.options = NA,
                 print.comments = FALSE,
@@ -153,7 +153,7 @@ require(lattice)
 
 dbh.mm <- res$live$data$dbh.mm
 dbh.mm.short <- reshape(dbh.mm, 
-                        varying = paste0("t", 0:5), 
+                        varying = paste0("t", 0:n.periods), 
                         timevar = "period",
                         direction = "long", sep = "")
 head(dbh.mm.short)
@@ -163,9 +163,9 @@ histogram( ~ t | period, data = dbh.mm.short, plot.points = FALSE,
           xlab = "dbh.mm")
 
 ## ------------------------------------------------------------------------
-vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$plot.id)))
-names(vol) <- paste0("t", 0:5)
-for (i.period in 0:5){
+vol <- data.frame(matrix(NA, ncol = n.periods+1, nrow = length(res$plot.data$plot.id)))
+names(vol) <- paste0("t", 0:n.periods)
+for (i.period in 0:n.periods){
     sa <- prep.common.vars.fun (
         tr = res$live, fl= res$plot.data,
         i.period, this.period = paste0("t", i.period),
@@ -178,7 +178,7 @@ for (i.period in 0:5){
     vol[, (i.period +1)] <- vol[, (i.period +1)] * sa$fl$ha2total
 }
 vol.m3.short <- reshape(vol, 
-                        varying = paste0("t", 0:5),
+                        varying = paste0("t", 0:n.periods),
                         timevar = "period",
                         direction = "long",
                     sep = "")
@@ -188,13 +188,14 @@ xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
                         ylab = "standing volume in mill. m3")
 
 ## ------------------------------------------------------------------------
-vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$plot.id)))
+vol <- data.frame(matrix(NA, ncol = n.periods + 1,
+                         nrow = length(res$plot.data$plot.id)))
 ## res$removed$data only contains the "history of the tree", but we need
 ## the dbh and height of the tree at harvest time
-names(vol) <- paste0("t", 0:5)
+names(vol) <- paste0("t", 0:n.periods)
 removed <- recover.last.measurement(res$removed)
 
-for (i.period in 0:5){
+for (i.period in 0:n.periods){
     sa <- prep.common.vars.fun (
         tr = res$removed,
         fl = res$plot.data,
@@ -211,7 +212,7 @@ for (i.period in 0:5){
 names(vol) <- paste0(substr(names(vol), 1, 1), ".", substr(names(vol), 2, 3))
 
 vol.m3.short <- reshape(vol, 
-                        varying = paste0("t.", 0:5),
+                        varying = paste0("t.", 0:n.periods),
                         timevar = "period",
                         idvar = "id",
                         direction = "long"
@@ -219,15 +220,15 @@ vol.m3.short <- reshape(vol,
 vol.m3.short$t[vol.m3.short$t == 0] <- NA
 harv.total <- aggregate(t ~ period, data = vol.m3.short, FUN = sum)
 xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
-       ylim = c(0, max(harv.total$t/1e6)+0.1),
        ylab = "harvested volume in mill. m3")
 
 ## ------------------------------------------------------------------------
-vol <- data.frame(matrix(NA, ncol = 6, nrow = length(res$plot.data$plot.id)))
-names(vol) <- paste0("t", 0:5)
+vol <- data.frame(matrix(NA, ncol = n.periods + 1,
+                         nrow = length(res$plot.data$plot.id)))
+names(vol) <- paste0("t", 0:n.periods)
 dead <- recover.last.measurement(res$dead)
 
-for (i.period in 0:5){
+for (i.period in 0:n.periods){
     sa <- prep.common.vars.fun (
         tr = res$dead, fl= res$plot.data,
         i.period, this.period = paste0("t", i.period),
@@ -241,7 +242,7 @@ for (i.period in 0:5){
 
 names(vol) <- paste0(substr(names(vol), 1, 1), ".", substr(names(vol), 2, 3))
 vol.m3.short <- reshape(vol, 
-                        varying = paste0("t.", 0:5),
+                        varying = paste0("t.", 0:n.periods),
                         timevar = "period",
                         idvar = "id",
                         direction = "long"
@@ -251,20 +252,18 @@ head(vol.m3.short)
 vol.m3.short$t[vol.m3.short$t == 0] <- NA
 harv.total <- aggregate(t ~ period, data = vol.m3.short, FUN = sum)
 xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
-       ylim = c(0, max(harv.total$t/1e6)+10),
        ylab = "volume of dead trees in mill. m3")
 
 ## ------------------------------------------------------------------------
 age <- res$plot.data$stand.age.years
 age.short<- reshape(age, 
-                    varying = paste0("t", 0:40), 
+                    varying = paste0("t", 0:n.periods), 
                     timevar = "period",
                     idvar = "id",                    
                     direction = "long",
                     sep = ""
                     )
 head(age.short)
-age.short <- age.short[!age.short$period > 5,] 
 histogram( ~ t | period, data = age.short, plot.points = FALSE,
           ref = TRUE, auto.key = list(space = "right"), xmin = 50,
           xlab = "stand age (in years)")
@@ -299,8 +298,11 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 
 ## ----eval = FALSE--------------------------------------------------------
 #  set.seed(2017)
+#  n.periods <- 10
 #  i.max <- 50
-#  vol.1 <- data.frame(matrix(NA, ncol = 6, nrow = i.max))
+#  vol.1 <- data.frame(matrix(NA, ncol = n.periods, nrow = i.max))
+#  names(vol.1) <- paste0("t", 0:n.periods)
+#  
 #  for (i in (1:i.max)){
 #      print(i)
 #      res1 <- sitree (tree.df   = tr,
@@ -316,7 +318,7 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                           fn.modif      = NULL,
 #                           fn.prep.common.vars = 'prep.common.vars.fun'
 #                       ),
-#                       n.periods = 5,
+#                       n.periods = n.periods,
 #                       period.length = 5,
 #                       mng.options = NA,
 #                       print.comments = FALSE,
@@ -330,8 +332,7 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                       per.vol.harv = 0.83
 #                       )
 #  
-#      names(vol) <- paste0("t", 0:5)
-#      for (i.period in 0:5){
+#      for (i.period in 0:n.periods){
 #          sa <- prep.common.vars.fun (
 #              tr = res1$live, fl= res1$plot.data,
 #              i.period, this.period = paste0("t", i.period),
@@ -345,7 +346,9 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 
 ## ----eval = FALSE--------------------------------------------------------
 #  
-#  vol.2 <- data.frame(matrix(NA, ncol = 6, nrow = i.max))
+#  vol.2 <- data.frame(matrix(NA, ncol = n.periods, nrow = i.max))
+#  names(vol.2) <- paste0("t", 0:n.periods)
+#  
 #  for (i in (1:i.max)){
 #      print(i)
 #  
@@ -362,7 +365,7 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                           fn.modif      = NULL,
 #                           fn.prep.common.vars = 'prep.common.vars.fun'
 #                       ),
-#                       n.periods = 5,
+#                       n.periods = n.periods,
 #                       period.length = 5,
 #                       mng.options = NA,
 #                       print.comments = FALSE,
@@ -375,8 +378,8 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                       'BBG2008', 'SBA.m2.ha', 'spp','pr.spru.ba', 'QMD.cm',
 #                       per.vol.harv = 0.83
 #                       )
-#      names(vol) <- paste0("t", 0:5)
-#      for (i.period in 0:5){
+#  
+#      for (i.period in 0:n.periods){
 #          sa <- prep.common.vars.fun (
 #              tr = res1$live, fl= res1$plot.data,
 #              i.period, this.period = paste0("t", i.period),
