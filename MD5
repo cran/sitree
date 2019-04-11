@@ -1,4 +1,4 @@
-c25499980fea5ff9a187a965a0877637 *DESCRIPTION
+37b984740e9f4ed73e044dc5af011fa3 *DESCRIPTION
 bb88d9c7527647e8f209131e90a56f63 *NAMESPACE
 b53eb89b72abbc8ef7478fb69724f30f *R/BBG2008.R
 4788c33c57ecbddf6b4f31b200c5e157 *R/FuruVol.R
@@ -25,11 +25,12 @@ e29dee945c2b098aba55cddc4685337e *R/mort.B2007.R
 b323dd41295ac7b3dda8f7f9d48f32da *R/post.recover.state.R
 98f8aa8c3eb748d062d8e666028202c5 *R/recover.last.measurement.R
 4e6a21320c8809144f8bd7d50a84d28e *R/recr.BBG2008.R
-e450f0f0023f05390d697d61c2145a81 *R/sitree.R
+38d696e5de3da456dbd3d4418f933920 *R/sitree.R
+b278032487022bcb868f1887e4e478f9 *R/sitree2dataframe.R
 c11c5ca7a7672fe6b9b20a2b69b29c98 *R/sitreesummary.R
 3bd2664190b9681f4755d6e8d4647ea0 *R/sp.classification.R
 f1fc832040f3e27eed3534a80d1eaf45 *R/tree.age.R
-91ccebd55b2a2d6f65b6f45329b04f31 *build/vignette.rds
+901830f234e5aa4eb592daccaab63dfa *build/vignette.rds
 fdfcdb2ac6b3f9cda564f4719b331578 *data/StandWestSt.RData
 eba7bca78e965a7129706862823855ea *data/StandWestTr.RData
 371017906d44c83e38e1324e63ebaf9e *data/fl.RData
@@ -37,11 +38,11 @@ fa2cf9a1c30b68b5640d6e5694257d4b *data/tr.RData
 86d0cbca0ab4e7ff43c4edd15256b657 *inst/CITATION
 e9e6f7f004184969649fd5debca50f4e *inst/doc/TestEquations.R
 604adf8e0c5014530cc17d2f1aef4d86 *inst/doc/TestEquations.Rmd
-c189512f188c45097a4a36e0f4ed9ce2 *inst/doc/TestEquations.html
+329c7708c0f6910bf13503b4411abb26 *inst/doc/TestEquations.html
 2abcf3bdcafda864db85482fb695128f *man/FuruVol.Rd
 d77761dce1c68eb946891f9ebc18d2bf *man/QMD.cm.f.Rd
 0196cda8c0d9d0d6b4a5c0aebf0fccbc *man/calculate.development.class.Rd
-0a66b13c9ed289bf5ec79878d25b9c5c *man/dbhi.BN2009.Rd
+99c8a2b1fa410faff95860b4b6086bae *man/dbhi.BN2009.Rd
 6aebbbad72d0b32ea62a22aeaa142118 *man/dead.trees.growth.Rd
 68a7638f9699a0113ebfb43f92eb189f *man/fl.Rd
 8f09c2d9d31e94c7ac64bf64bec67c5f *man/fn.vars.required.Rd
@@ -55,6 +56,7 @@ f82cfb8b556d1ae000f648ef881d3488 *man/recover.last.measurement.Rd
 cef2d5527498975d3f8afc68ca790b69 *man/recover.state.Rd
 a6e88f4d27c02cd4a251604182d37f00 *man/recr.BBG2008.Rd
 6e0082e4ba16ecd58606ecb6e1c640e2 *man/sitree.Rd
+f597dc90794fd8217bf3fd884d3210bd *man/sitree2dataframe.Rd
 0a76d8bf59cc2464fd7329c3b842ada4 *man/sitreesummary.Rd
 4d49ee85fa6141af9cc3c3758384f241 *man/sp.classification.Rd
 ac21383c36b9afa1e62f1a4c8fad7d57 *man/stand.west.st.Rd
@@ -63,5 +65,5 @@ f11784d010a275a42427f41879d21f0d *man/stand.west.tr.Rd
 4950b8a03d756617bfc45bb85fb88feb *man/tr.Rd
 e0e1f4833f9892a4a5a33ab0782885a0 *man/trList-class.Rd
 0ef2d464c1b0c169e7759e1464f5ada8 *man/trListDead-class.Rd
-3a169aeae7256777c2e499dd447ac4d7 *man/tree.age.Rd
+83a1ac719c55c8a4fd1bf28226a079b1 *man/tree.age.Rd
 604adf8e0c5014530cc17d2f1aef4d86 *vignettes/TestEquations.Rmd
