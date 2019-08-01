@@ -37,8 +37,6 @@ square$sides
                  stand.df  = fl,
                  functions = list(
                      fn.growth     = 'grow.dbhinc.hgtinc',
-                     fn.dbh.inc = "dbhi.BN2009",
-                     fn.hgt.inc =  "height.korf", 
                      fn.mort       = 'mort.B2007',
                      fn.recr       = 'recr.BBG2008',
                      fn.management = 'management.prob',
@@ -50,6 +48,8 @@ square$sides
                  period.length = 5,
                  mng.options = NA,
                  print.comments = FALSE,
+                 fn.dbh.inc = "dbhi.BN2009",
+                 fn.hgt.inc =  "height.korf", 
                  species.spruce = c(1, 2, 3),
                  species.pine = c(10, 11, 20, 21, 29),
                  species.harw = c(30, 31),
@@ -122,8 +122,6 @@ res <- sitree (tree.df   = tr,
                 stand.df  = fl,
                 functions = list(
                     fn.growth     = 'grow.dbhinc.hgtinc',
-                    fn.dbh.inc = "dbhi.BN2009",
-                    fn.hgt.inc =  "height.korf", 
                     fn.mort       = 'mort.B2007',
                     fn.recr       = 'recr.BBG2008',
                     fn.management = 'management.prob',
@@ -135,6 +133,8 @@ res <- sitree (tree.df   = tr,
                 period.length = 5,
                 mng.options = NA,
                 print.comments = FALSE,
+                fn.dbh.inc = "dbhi.BN2009",
+                fn.hgt.inc =  "height.korf", 
                 species.spruce = c(1, 2, 3),
                 species.pine = c(10, 11, 20, 21, 29),
                 species.harw = c(30, 31),
@@ -257,16 +257,16 @@ xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
 ## ------------------------------------------------------------------------
 age <- res$plot.data$stand.age.years
 age.short<- reshape(age, 
-                    varying = paste0("t", 0:n.periods), 
+                    varying = paste0("t", 0:(n.periods-1)), 
                     timevar = "period",
                     idvar = "id",                    
                     direction = "long",
                     sep = ""
                     )
-head(age.short)
-histogram( ~ t | period, data = age.short, plot.points = FALSE,
-          ref = TRUE, auto.key = list(space = "right"), xmin = 50,
-          xlab = "stand age (in years)")
+##head(age.short)
+##histogram( ~ t | period, data = age.short, plot.points = FALSE,
+##          ref = TRUE, auto.key = list(space = "right"), xmin = 50,
+##          xlab = "stand age (in years)")
 
 ## ------------------------------------------------------------------------
 ET2001 <- function (tr, fl, common.vars, this.period, ...) 
@@ -309,8 +309,6 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                       stand.df  = fl,
 #                       functions = list(
 #                           fn.growth     = 'grow.dbhinc.hgtinc',
-#                           fn.dbh.inc = "dbhi.BN2009",
-#                           fn.hgt.inc =  "height.korf",
 #                           fn.mort       = 'mort.B2007',
 #                           fn.recr       = 'recr.BBG2008',
 #                           fn.management = 'management.prob',
@@ -322,6 +320,8 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                       period.length = 5,
 #                       mng.options = NA,
 #                       print.comments = FALSE,
+#                       fn.dbh.inc = "dbhi.BN2009",
+#                       fn.hgt.inc =  "height.korf",
 #                       species.spruce = c(1, 2, 3),
 #                       species.pine = c(10, 11, 20, 21, 29),
 #                       species.harw = c(30, 31),
@@ -356,8 +356,6 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                       stand.df  = fl,
 #                       functions = list(
 #                           fn.growth     = 'grow.dbhinc.hgtinc',
-#                           fn.dbh.inc = "dbhi.BN2009",
-#                           fn.hgt.inc =  "height.korf",
 #                           fn.mort       = 'ET2001',
 #                           fn.recr       = 'recr.BBG2008',
 #                           fn.management = 'management.prob',
@@ -369,6 +367,8 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                       period.length = 5,
 #                       mng.options = NA,
 #                       print.comments = FALSE,
+#                       fn.dbh.inc = "dbhi.BN2009",
+#                       fn.hgt.inc =  "height.korf",
 #                       species.spruce = c(1, 2, 3),
 #                       species.pine = c(10, 11, 20, 21, 29),
 #                       species.harw = c(30, 31),
