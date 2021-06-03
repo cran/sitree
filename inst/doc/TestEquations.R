@@ -1,39 +1,47 @@
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Always bare in mind that RF trList and trListDead are modified in place
 ## Do not copy 
 
 Polygon <- setRefClass("Polygon", fields = c("sides"))
 square <- Polygon$new(sides = 4)
 
-la <- function(a){    
-    triangle <- square
-    triangle$sides <- 3
-    return(a+2)
+square.to.triangle <- function(a){
+  ## This makes the object triangle point to square, it does not create a copy
+  ## since square is a RC object
+  triangle <- square
+  ## when we modifiy triangle we are modifying square.
+  triangle$sides <- 3
+  return(a+2)
 }
 
+## square has 4 sides
 square$sides
-la(2)
+## when we call the square.to.triangle function the 'square' object
+## gets modified, eventhough we don't pass it as argument. That is because
+## it is referenced inside the function
+square.to.triangle(2)
 
 square$sides
 
 ## but if we do
 square <- Polygon$new(sides = 4)
 
-la <- function(a){    
+square.to.triangle <- function(a){    
     triangle <- square$copy()
     triangle$sides <- 3
     return(a+2)
 }
 
 square$sides
-la(2)
+square.to.triangle(2)
 ## the object remains unchanged
 square$sides
 
-## ------------------------------------------------------------------------
 
- require(sitree)
- res <- sitree (tree.df   = tr,
+## -----------------------------------------------------------------------------
+
+library(sitree)
+res <- sitree (tree.df   = tr,
                  stand.df  = fl,
                  functions = list(
                      fn.growth     = 'grow.dbhinc.hgtinc',
@@ -50,13 +58,8 @@ square$sides
                  print.comments = FALSE,
                  fn.dbh.inc = "dbhi.BN2009",
                  fn.hgt.inc =  "height.korf", 
-                 species.spruce = c(1, 2, 3),
-                 species.pine = c(10, 11, 20, 21, 29),
-                 species.harw = c(30, 31),
                  fun.final.felling = "harv.prob",
                  fun.thinning      = "thin.prob",
-                 'BN2009',
-                 'BBG2008', 'SBA.m2.ha', 'spp','pr.spru.ba', 'QMD.cm',
                  per.vol.harv = 0.83
                  )
  
@@ -113,10 +116,13 @@ square$sides
  
 
 
+  
+  
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
  
 set.seed(2017)
+
 n.periods <- 50
 res <- sitree (tree.df   = tr,
                 stand.df  = fl,
@@ -135,21 +141,16 @@ res <- sitree (tree.df   = tr,
                 print.comments = FALSE,
                 fn.dbh.inc = "dbhi.BN2009",
                 fn.hgt.inc =  "height.korf", 
-                species.spruce = c(1, 2, 3),
-                species.pine = c(10, 11, 20, 21, 29),
-                species.harw = c(30, 31),
                 fun.final.felling = "harv.prob",
                 fun.thinning      = "thin.prob",
-                'BN2009',
-                'BBG2008', 'SBA.m2.ha', 'spp','pr.spru.ba', 'QMD.cm',
                 per.vol.harv = 0.83
                 )
 
 
 
 
-## ------------------------------------------------------------------------
-require(lattice)
+
+## -----------------------------------------------------------------------------
 
 dbh.mm <- res$live$data$dbh.mm
 dbh.mm.short <- reshape(dbh.mm, 
@@ -158,18 +159,18 @@ dbh.mm.short <- reshape(dbh.mm,
                         direction = "long", sep = "")
 head(dbh.mm.short)
 dbh.mm.short$t[dbh.mm.short$t == 0] <- NA
-histogram( ~ t | period, data = dbh.mm.short, plot.points = FALSE,
-          ref = TRUE, auto.key = list(space = "right"), xmin = 50,
-          xlab = "dbh.mm")
+library(ggplot2)
+ggplot(dbh.mm.short, aes(x = t)) + geom_histogram() + ylab('dbh.mm') +
+   facet_wrap(~ period) + theme_minimal()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 vol <- data.frame(matrix(NA, ncol = n.periods+1, nrow = length(res$plot.data$plot.id)))
 names(vol) <- paste0("t", 0:n.periods)
 for (i.period in 0:n.periods){
     sa <- prep.common.vars.fun (
         tr = res$live, fl= res$plot.data,
         i.period, this.period = paste0("t", i.period),
-        common.vars = NULL, vars.required = "vuprha.m3.ha", 
+        common.vars = NULL, 
         period.length = 5 )
     
     vol[, (i.period +1)] <- sa$res$vuprha.m3.ha 
@@ -183,11 +184,17 @@ vol.m3.short <- reshape(vol,
                         direction = "long",
                     sep = "")
 vol.m3.short$t[vol.m3.short$t == 0] <- NA
-harv.total <- aggregate(t ~ period, data = vol.m3.short, FUN = sum)
-xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
-                        ylab = "standing volume in mill. m3")
+total.standing.volume <- aggregate(t ~ period, data = vol.m3.short, FUN = sum)
+total.standing.volume$vol.mill.m3  <- total.standing.volume$t/1e6
 
-## ------------------------------------------------------------------------
+ggplot(total.standing.volume,
+       aes(period, vol.mill.m3))   + geom_line()+
+  ylab("standing volume (mill m3)") + theme_minimal()
+
+
+
+
+## -----------------------------------------------------------------------------
 vol <- data.frame(matrix(NA, ncol = n.periods + 1,
                          nrow = length(res$plot.data$plot.id)))
 ## res$removed$data only contains the "history of the tree", but we need
@@ -196,16 +203,15 @@ names(vol) <- paste0("t", 0:n.periods)
 removed <- recover.last.measurement(res$removed)
 
 for (i.period in 0:n.periods){
-    sa <- prep.common.vars.fun (
+    harv.vol <- prep.common.vars.fun (
         tr = res$removed,
         fl = res$plot.data,
         i.period,
         this.period = paste0("t", i.period),
         common.vars = NULL,
-        vars.required = "vuprha.m3.ha", 
         period.length = 5 )
     
-    vol[, (i.period +1)] <- sa$res$vuprha.m3.ha 
+    vol[, (i.period +1)] <- harv.vol$res$vuprha.m3.ha 
     ## This is volume per ha, if we prefer just m3.
     vol[, (i.period +1)] <- vol[, (i.period +1)] * sa$fl$ha2total
 }
@@ -219,23 +225,29 @@ vol.m3.short <- reshape(vol,
                         )
 vol.m3.short$t[vol.m3.short$t == 0] <- NA
 harv.total <- aggregate(t ~ period, data = vol.m3.short, FUN = sum)
-xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
-       ylab = "harvested volume in mill. m3")
 
-## ------------------------------------------------------------------------
+ggplot(harv.total, aes(period, t))   + geom_line()+
+  ylab("harvested volume ( m3)") + theme_minimal()
+
+
+
+
+## -----------------------------------------------------------------------------
 vol <- data.frame(matrix(NA, ncol = n.periods + 1,
                          nrow = length(res$plot.data$plot.id)))
 names(vol) <- paste0("t", 0:n.periods)
 dead <- recover.last.measurement(res$dead)
 
 for (i.period in 0:n.periods){
-    sa <- prep.common.vars.fun (
-        tr = res$dead, fl= res$plot.data,
-        i.period, this.period = paste0("t", i.period),
-        common.vars = NULL, vars.required = "vuprha.m3.ha", 
-        period.length = 5 )
+  vol[, (i.period +1)] <-
+    prep.common.vars.fun (
+      tr = dead,
+      fl= res$plot.data,
+      i.period,
+      this.period = paste0("t", i.period),
+      common.vars = NULL,
+      period.length = 5 )$res$vuprha.m3.ha 
     
-    vol[, (i.period +1)] <- sa$res$vuprha.m3.ha 
     ## This is volume per ha, if we prefer just m3.
     vol[, (i.period +1)] <- vol[, (i.period +1)] * sa$fl$ha2total
 }
@@ -247,14 +259,19 @@ vol.m3.short <- reshape(vol,
                         idvar = "id",
                         direction = "long"
                         )
+
 head(vol.m3.short)
 
-vol.m3.short$t[vol.m3.short$t == 0] <- NA
-harv.total <- aggregate(t ~ period, data = vol.m3.short, FUN = sum)
-xyplot( t/1e6 ~ period, data = harv.total, type = 'l',
-       ylab = "volume of dead trees in mill. m3")
+## let's plot dead trees by plot, for the first 10 plots
+## to look at the variation
+ggplot(vol.m3.short[vol.m3.short$id %in% 1:10,],
+       aes(period, t, group = id, col = as.factor(id)))   +
+  geom_line()+
+  ylab("Dead trees volume (mill m3)") + theme_minimal()
 
-## ------------------------------------------------------------------------
+
+
+## -----------------------------------------------------------------------------
 age <- res$plot.data$stand.age.years
 age.short<- reshape(age, 
                     varying = paste0("t", 0:(n.periods-1)), 
@@ -263,12 +280,11 @@ age.short<- reshape(age,
                     direction = "long",
                     sep = ""
                     )
-##head(age.short)
-##histogram( ~ t | period, data = age.short, plot.points = FALSE,
-##          ref = TRUE, auto.key = list(space = "right"), xmin = 50,
-##          xlab = "stand age (in years)")
+head(age.short)
+ggplot(age.short, aes(x = t)) + geom_histogram() + ylab('dbh.mm') +
+   facet_wrap(~ period) + theme_minimal()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ET2001 <- function (tr, fl, common.vars, this.period, ...) 
 {
     if (!all(unique(common.vars$spp) %in% c("spruce", "pine", 
@@ -296,12 +312,13 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
     return(mort)
 }
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  set.seed(2017)
 #  n.periods <- 10
-#  i.max <- 50
-#  vol.1 <- data.frame(matrix(NA, ncol = n.periods, nrow = i.max))
+#  i.max <- 20
+#  vol.1 <- data.frame(matrix(NA, ncol = n.periods +1, nrow = i.max))
 #  names(vol.1) <- paste0("t", 0:n.periods)
+#  
 #  
 #  for (i in (1:i.max)){
 #      print(i)
@@ -322,13 +339,8 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                       print.comments = FALSE,
 #                       fn.dbh.inc = "dbhi.BN2009",
 #                       fn.hgt.inc =  "height.korf",
-#                       species.spruce = c(1, 2, 3),
-#                       species.pine = c(10, 11, 20, 21, 29),
-#                       species.harw = c(30, 31),
 #                       fun.final.felling = "harv.prob",
 #                       fun.thinning      = "thin.prob",
-#                       'BN2009',
-#                       'BBG2008', 'SBA.m2.ha', 'spp','pr.spru.ba', 'QMD.cm',
 #                       per.vol.harv = 0.83
 #                       )
 #  
@@ -336,17 +348,18 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #          sa <- prep.common.vars.fun (
 #              tr = res1$live, fl= res1$plot.data,
 #              i.period, this.period = paste0("t", i.period),
-#              common.vars = NULL, vars.required = "vuprha.m3.ha",
+#              common.vars = NULL,
 #              period.length = 5 )
 #  
 #          vol.1[i, (i.period +1)] <- sum(sa$res$vuprha.m3.ha * sa$fl$ha2total )
 #  
 #      }
 #  }
-
-## ----eval = FALSE--------------------------------------------------------
 #  
-#  vol.2 <- data.frame(matrix(NA, ncol = n.periods, nrow = i.max))
+
+## ----eval = FALSE-------------------------------------------------------------
+#  
+#  vol.2 <- data.frame(matrix(NA, ncol = n.periods+1, nrow = i.max))
 #  names(vol.2) <- paste0("t", 0:n.periods)
 #  
 #  for (i in (1:i.max)){
@@ -369,13 +382,8 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
 #                       print.comments = FALSE,
 #                       fn.dbh.inc = "dbhi.BN2009",
 #                       fn.hgt.inc =  "height.korf",
-#                       species.spruce = c(1, 2, 3),
-#                       species.pine = c(10, 11, 20, 21, 29),
-#                       species.harw = c(30, 31),
 #                       fun.final.felling = "harv.prob",
 #                       fun.thinning      = "thin.prob",
-#                       'BN2009','PBAL.m2.ha',
-#                       'BBG2008', 'SBA.m2.ha', 'spp','pr.spru.ba', 'QMD.cm',
 #                       per.vol.harv = 0.83
 #                       )
 #  
