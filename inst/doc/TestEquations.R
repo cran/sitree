@@ -285,19 +285,14 @@ ggplot(age.short, aes(x = t)) + geom_histogram() + ylab('dbh.mm') +
    facet_wrap(~ period) + theme_minimal()
 
 ## -----------------------------------------------------------------------------
-ET2001 <- function (tr, fl, common.vars, this.period, ...) 
-{
-    if (!all(unique(common.vars$spp) %in% c("spruce", "pine", 
-                                            "birch", "other"))) {
-        message("spp should only contain values spruce, pine, birch, other")
-    }
+ET2001 <- function (tr, fl, common.vars, this.period, ...) {
     dbh.mm <- tr$data[["dbh.mm"]][, this.period]
     p.functions <-
-        data.frame(a0 = c( 8.059,   8.4904, 4.892,  5.157),
-                   b1 = c(-6.702, -14.266, -2.528, -7.3544),
-                   b2 = c(-0.028,  -0.0462, 0,     -0.0199),
-                   b3 = c(-0.0264, -0.0761, 0,     0 ),
-                   b4 = c(-0.0132, -0.0761, 0,     0 )
+        data.frame(a0 = c( 8.06,   8.49, 4.89,  5.16),
+                   b1 = c(-6.7, -14.27, -2.528, -7.35),
+                   b2 = c(-0.03,  -0.05, 0,     -0.02),
+                   b3 = c(-0.03, -0.08, 0,     0 ),
+                   b4 = c(-0.01, -0.08, 0,     0 )
                    )
     rownames(p.functions) <- c("spruce", "pine", "birch", "other")
   
@@ -307,100 +302,101 @@ ET2001 <- function (tr, fl, common.vars, this.period, ...)
         p.functions[common.vars$spp, "b3"] * fl$SI.m[common.vars$i.stand] + 
         p.functions[common.vars$spp, "b4"] * common.vars$pr.spp.ba$spru
     mort.B <- 1- (1/(1 + exp(-logit)))
-    mort <- ifelse(mort.B >= runif(length(tr$data[["plot.id"]]), 
-                                   0, 1), TRUE, FALSE)
+    mort <- ifelse(mort.B >= runif(nrow(tr$data$dbh.mm),  0, 1), TRUE, FALSE)
     return(mort)
 }
 
-## ----eval = FALSE-------------------------------------------------------------
-#  set.seed(2017)
-#  n.periods <- 10
-#  i.max <- 20
-#  vol.1 <- data.frame(matrix(NA, ncol = n.periods +1, nrow = i.max))
-#  names(vol.1) <- paste0("t", 0:n.periods)
-#  
-#  
-#  for (i in (1:i.max)){
-#      print(i)
-#      res1 <- sitree (tree.df   = tr,
-#                       stand.df  = fl,
-#                       functions = list(
-#                           fn.growth     = 'grow.dbhinc.hgtinc',
-#                           fn.mort       = 'mort.B2007',
-#                           fn.recr       = 'recr.BBG2008',
-#                           fn.management = 'management.prob',
-#                           fn.tree.removal = 'mng.tree.removal',
-#                           fn.modif      = NULL,
-#                           fn.prep.common.vars = 'prep.common.vars.fun'
-#                       ),
-#                       n.periods = n.periods,
-#                       period.length = 5,
-#                       mng.options = NA,
-#                       print.comments = FALSE,
-#                       fn.dbh.inc = "dbhi.BN2009",
-#                       fn.hgt.inc =  "height.korf",
-#                       fun.final.felling = "harv.prob",
-#                       fun.thinning      = "thin.prob",
-#                       per.vol.harv = 0.83
-#                       )
-#  
-#      for (i.period in 0:n.periods){
-#          sa <- prep.common.vars.fun (
-#              tr = res1$live, fl= res1$plot.data,
-#              i.period, this.period = paste0("t", i.period),
-#              common.vars = NULL,
-#              period.length = 5 )
-#  
-#          vol.1[i, (i.period +1)] <- sum(sa$res$vuprha.m3.ha * sa$fl$ha2total )
-#  
-#      }
-#  }
-#  
 
-## ----eval = FALSE-------------------------------------------------------------
-#  
-#  vol.2 <- data.frame(matrix(NA, ncol = n.periods+1, nrow = i.max))
-#  names(vol.2) <- paste0("t", 0:n.periods)
-#  
-#  for (i in (1:i.max)){
-#      print(i)
-#  
-#      res2 <- sitree (tree.df   = tr,
-#                       stand.df  = fl,
-#                       functions = list(
-#                           fn.growth     = 'grow.dbhinc.hgtinc',
-#                           fn.mort       = 'ET2001',
-#                           fn.recr       = 'recr.BBG2008',
-#                           fn.management = 'management.prob',
-#                           fn.tree.removal = 'mng.tree.removal',
-#                           fn.modif      = NULL,
-#                           fn.prep.common.vars = 'prep.common.vars.fun'
-#                       ),
-#                       n.periods = n.periods,
-#                       period.length = 5,
-#                       mng.options = NA,
-#                       print.comments = FALSE,
-#                       fn.dbh.inc = "dbhi.BN2009",
-#                       fn.hgt.inc =  "height.korf",
-#                       fun.final.felling = "harv.prob",
-#                       fun.thinning      = "thin.prob",
-#                       per.vol.harv = 0.83
-#                       )
-#  
-#      for (i.period in 0:n.periods){
-#          sa <- prep.common.vars.fun (
-#              tr = res1$live, fl= res1$plot.data,
-#              i.period, this.period = paste0("t", i.period),
-#              common.vars = NULL, vars.required = "vuprha.m3.ha",
-#              period.length = 5 )
-#  
-#          vol.2[i, (i.period +1)] <- sum(sa$res$vuprha.m3.ha * sa$fl$ha2total )
-#  
-#      }
-#  }
-#  ## During the five periods, there is actually not that much of a difference
-#  colMeans(vol.1)/1e6
-#  colMeans(vol.2)/1e6
-#  
-#  
+## -----------------------------------------------------------------------------
+SBA.m2.ha <- list()
+set.seed(2017)
+for ( i.to in 1:20){
+ 
+  result.sitree.ET2001 <-
+    sitree (tree.df   = tr,
+            stand.df  = fl,
+            functions = list(
+              fn.growth     = 'grow.dbhinc.hgtinc',
+              fn.mort       = 'ET2001',
+              fn.recr       = 'recr.BBG2008',
+              fn.management = NULL,
+              fn.tree.removal = NULL,
+              fn.modif      = NULL, 
+              fn.prep.common.vars = 'prep.common.vars.fun'
+            ),
+            n.periods = 16,
+            period.length = 5,
+            mng.options = NA,
+            print.comments = FALSE,
+            fn.dbh.inc    = 'dbhi.BN2009',
+            fn.hgt.inc    = 'height.korf'
+            )
+    
+  ## We extract basal area from sitree.summary
+  SBA.m2.ha[[i.to]] <-
+    attr(sitree.summary(
+      result.sitree.ET2001,
+      plots = c(1),
+      by.stand = TRUE,
+      plot.all.together = TRUE,
+      plot = FALSE), "data")$SBA.m2.ha
+}
+
+library(data.table)
+SBA.m2.ha.ET2001 <- rbindlist(SBA.m2.ha)
+SBA.m2.ET2001 <- aggregate(t ~ period + plot.id, data = SBA.m2.ha.ET2001,
+                              FUN = mean)                              
+
+## -----------------------------------------------------------------------------
+
+SBA.m2.ha <- list()
+set.seed(2017)
+for ( i.to in 1:20){
+  
+  result.sitree <-
+    sitree (tree.df   = tr,
+            stand.df  = fl,
+            functions = list(
+              fn.growth     = 'grow.dbhinc.hgtinc',
+              fn.mort       = 'mort.B2007',
+              fn.recr       = 'recr.BBG2008',
+              fn.management = NULL,
+              fn.tree.removal = NULL,
+              fn.modif      = NULL, 
+              fn.prep.common.vars = 'prep.common.vars.fun'
+            ),
+            n.periods = 16,
+            period.length = 5,
+            mng.options = NA,
+            print.comments = FALSE,
+            fn.dbh.inc    = 'dbhi.BN2009',
+            fn.hgt.inc    = 'height.korf'
+            )
+  ## Basal area
+  SBA.m2.ha[[i.to]] <- attr(sitree.summary(
+    result.sitree,
+    plots = c(1),
+    by.stand = TRUE,
+    plot.all.together = TRUE,
+    plot = FALSE), "data")$SBA.m2.ha
+  
+}
+
+SBA.m2.ha.B2007 <- rbindlist(SBA.m2.ha)
+SBA.m2.B2007 <- aggregate(t ~ period + plot.id, data = SBA.m2.ha.B2007,
+                              FUN = mean)
+
+SBA.m2.B2007$mort <- "mort.B2007"
+SBA.m2.ET2001$mort <- "ET2001"
+
+
+
+## -----------------------------------------------------------------------------
+mort.data <- rbind(SBA.m2.B2007, SBA.m2.ET2001)
+mort.data$uid  <- as.factor(paste0(mort.data$plot.id, mort.data$mort))
+ggplot(mort.data[mort.data$plot.id %in% 1:10,],
+       aes(  period, t, col = mort, group = uid)) +
+  geom_line() + ylab ( "Stand basal area (m2)")+ 
+  theme(legend.title = element_blank())
+
 
