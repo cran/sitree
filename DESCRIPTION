@@ -1,6 +1,6 @@
 Package: sitree
-Version: 0.1-9
-Date: 2021-08-03
+Version: 0.1-10
+Date: 2021-09-22
 Title: Single Tree Simulator
 Authors@R: person("Clara", "Anton Fernandez", role = c("aut", "cre"),
 		     email = "caf@nibio.no")
@@ -16,6 +16,6 @@ Encoding: UTF-8
 LazyLoad: yes
 LazyData: yes
 NeedsCompilation: no
-Packaged: 2021-08-04 02:19:31 UTC; clara
+Packaged: 2021-09-22 06:52:08 UTC; clara
 Repository: CRAN
-Date/Publication: 2021-08-04 04:50:05 UTC
+Date/Publication: 2021-09-22 07:20:02 UTC
