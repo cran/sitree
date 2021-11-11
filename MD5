@@ -1,4 +1,4 @@
-61c60233cdd38e622aed732361215756 *DESCRIPTION
+b31c8eae0d33e744ccab281b44a8c473 *DESCRIPTION
 479f44d596f45ea331599dbe51572a57 *NAMESPACE
 b53eb89b72abbc8ef7478fb69724f30f *R/BBG2008.R
 9faf06ab851503071076165529eb02f0 *R/HarwNorVol.R
@@ -31,7 +31,7 @@ b978a9956c62c22fb3b2810ac41cde83 *R/sitree2dataframe.R
 0a7109ba564b4c0c0f1b47c9bdda0c0b *R/sitreesummary.R
 3bd2664190b9681f4755d6e8d4647ea0 *R/sp.classification.R
 456084d7f568546e195ec7ede57ed2f2 *R/zzz.R
-2518dfd4e3fad4842d4f8396a742c607 *build/vignette.rds
+eaa61dd1467e4c29b1af5099036dea44 *build/vignette.rds
 438cfc6c39e563da447f3c8354e48502 *data/StandWestSt.RData
 72ebaa1318aaed8519c5daa66d514a15 *data/StandWestTr.RData
 371017906d44c83e38e1324e63ebaf9e *data/fl.RData
@@ -39,10 +39,10 @@ fa2cf9a1c30b68b5640d6e5694257d4b *data/tr.RData
 86d0cbca0ab4e7ff43c4edd15256b657 *inst/CITATION
 c0702f69cc7746104e4cd6328e106e27 *inst/doc/SiTree.R
 91978cc844b693330bbe93f1ce7dcb3c *inst/doc/SiTree.Rmd
-addcd88a26cafc3b768a2820b16be340 *inst/doc/SiTree.html
+c594e874745e22d8cfbf2ee1f791147d *inst/doc/SiTree.html
 127e0f0370f9d808db514c3c93e81f9c *inst/doc/TestEquations.R
-7d40054d9306f4e228758e1befffc868 *inst/doc/TestEquations.Rmd
-b3a3e318294b24215910060ebffef8cf *inst/doc/TestEquations.html
+3d69ab18bc945431c2733299390d717a *inst/doc/TestEquations.Rmd
+fd1bf4b1cd83cafaee31e11e7ec54fe7 *inst/doc/TestEquations.html
 d77761dce1c68eb946891f9ebc18d2bf *man/QMD.cm.f.Rd
 0196cda8c0d9d0d6b4a5c0aebf0fccbc *man/calculate.development.class.Rd
 05f3f2f0bbe0699219ee91b664c631d4 *man/dbhi.BN2009.Rd
@@ -71,4 +71,4 @@ e0e1f4833f9892a4a5a33ab0782885a0 *man/trList-class.Rd
 0ef2d464c1b0c169e7759e1464f5ada8 *man/trListDead-class.Rd
 7fb72a9c1bc9dab7bd5d8efe39d268ab *man/volume.norway.Rd
 91978cc844b693330bbe93f1ce7dcb3c *vignettes/SiTree.Rmd
-7d40054d9306f4e228758e1befffc868 *vignettes/TestEquations.Rmd
+3d69ab18bc945431c2733299390d717a *vignettes/TestEquations.Rmd
