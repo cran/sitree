@@ -1,12 +1,12 @@
 Package: sitree
-Version: 0.1-11
-Date: 2021-11-10
+Version: 0.1-12
+Date: 2021-11-20
 Title: Single Tree Simulator
 Authors@R: person("Clara", "Anton Fernandez", role = c("aut", "cre"),
 		     email = "caf@nibio.no")
 Author: Clara Anton Fernandez [aut, cre]
 Maintainer: Clara Anton Fernandez <caf@nibio.no>
-Depends: R (>= 4.1.0), ggplot2
+Depends: R (>= 3.5.0), ggplot2
 Suggests: rmarkdown, knitr
 Imports: data.table, methods
 VignetteBuilder: knitr
@@ -16,6 +16,6 @@ Encoding: UTF-8
 LazyLoad: yes
 LazyData: yes
 NeedsCompilation: no
-Packaged: 2021-11-10 13:06:07 UTC; clara
+Packaged: 2021-11-22 13:01:55 UTC; clara
 Repository: CRAN
-Date/Publication: 2021-11-11 14:50:02 UTC
+Date/Publication: 2021-11-22 13:30:02 UTC
