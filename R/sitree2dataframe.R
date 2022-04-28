@@ -8,8 +8,8 @@ sitree2dataframe <- function(tr.dt){
 i.height.dm <- tree.sp <- treeid <- plot.id <- NULL
 
 
-  if (!class(tr.dt) %in% c('trList', 'trListDead')) stop('the object is not of class trList')
-  if (class(tr.dt) == 'trList'){
+  if (!(is(tr.dt, 'trList') | is(tr.dt,  'trListDead'))) stop('the object is not of class trList')
+  if (is(tr.dt, 'trList')){
     period.names <-  names(tr.dt$data$dbh.mm)
     dbh.mm <- data.table(tr.dt$data$dbh.mm)
     dbh.mm[, treeid := tr.dt$data$treeid]
@@ -29,7 +29,7 @@ i.height.dm <- tree.sp <- treeid <- plot.id <- NULL
     dbh.mm[height.dm, height.dm := i.height.dm, on =c('treeid', 'period')]
     return(as.data.frame(dbh.mm))
   }
-  if (class(tr.dt) == 'trListDead'){ ## for dead and harvested
+  if (is(tr.dt, 'trListDead')){ ## for dead and harvested
     dead <- tr.dt$last.measurement
     dead$tree.sp <- tr.dt$data$tree.sp
     return(dead)

@@ -33,7 +33,7 @@ function (dbh,  trh, bark, units)
     else if (bark == "ub") {
         i <- f.dmb < 10.1
         vol[i] <- 0.38 + (0.02524 * (dub[i]^2) * h[i]) + (0.01269 * 
-            dub[i] * h[i]^2) - (0.07726 * h[i]^2) + (0.111671 * 
+            dub[i] * h[i]^2) - (0.07726 * h[i]^2) + (0.11671 * 
             dub[i] * h[i])
         i <- f.dmb >= 10.1 & f.dmb <= 12.9
         vol[i] <- -27.19 + (0.0073 * dub[i] * h[i]^2) + (0.0228 * 

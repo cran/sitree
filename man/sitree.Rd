@@ -1,6 +1,5 @@
 \name{sitree}
 \alias{sitree}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Individual Tree Simulator
 }
@@ -8,12 +7,13 @@ Individual Tree Simulator
 Simulates the growth of individual trees in several plots, including
 management and keeping record of dead and removed trees. It can also
 include the effect of external modifiers such as climate change.
+The SiTree package is described in Antón-Fernández, C., & Astrup, R. (2022). https://doi.org/10.1016/j.softx.2021.100925
+
 }
 \usage{
 sitree(tree.df, stand.df, functions, n.periods = 5, period.length,
 mng.options = NA, print.comments = FALSE,..., ext.mod.first = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tree.df}{
 A data frame with individual tree data. It should include four columns
@@ -64,7 +64,9 @@ applied at each plot at each period.
 Clara Anton Fernandez \email{caf@nibio.no}
 }
 
-
+\references{
+Antón-Fernández, C., & Astrup, R. (2022). SiTree: A framework to implement single-tree simulators. SoftwareX, 18, 100925. https://doi.org/10.1016/j.softx.2021.100925
+}
 
 \examples{
 result.sitree <- sitree (tree.df   = tr,

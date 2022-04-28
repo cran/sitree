@@ -2,13 +2,11 @@
 \alias{recr.BBG2008}
 \encoding{UTF-8}
 \alias{BBG2008}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Recruitment function following BBG2008
 }
 \description{
-It creates a list of new trees based on the functions from BBG2008 (see
-references). BBG2008 functions estimates recruitment on a plot based on
+It creates a list of new trees based on the functions from BBG2008, Bollandsås et al. (2008) doi:10.1080/02827580801995315 . BBG2008 functions estimates recruitment on a plot based on
 stand basal area, SI, and pine, spruce, birch, and other broadleaved
 species abundance. The implementation of this function is stochastic,
 not deterministic. So, if run several times without setting a seed, the
@@ -19,7 +17,6 @@ recr.BBG2008(tr, fl, common.vars, i.period, this.period, next.period, ...)
 BBG2008 (SBA.m2.ha, SI.m, pr.spru.ba, pr.pine.ba, pr.birch.ba, 
     pr.other.ba) 
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tr}{
 A trList object
@@ -28,7 +25,6 @@ A trList object
 A list describing the plot information
 }
   \item{common.vars}{
-%%     ~~Describe \code{common.vars} here~~
 }
   \item{i.period}{
 The number of period (from 0 to nperiods) for which to calculate recruitment.
