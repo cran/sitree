@@ -27,7 +27,9 @@ The period for which to calculate final felling and thinning probability.
 \item{next.period}{
 The next period to the one for which final felling and thinning probability are to be calculated.
 }
-  \item{\dots}{
+\item{\dots}{
+  A list containing at least an element named per.vol.harv, that should
+  contain the percentatge of volume removed within each plot/stand.
 }
 }
 

@@ -43,6 +43,7 @@ The period for which to calculate final felling and thinning probability.
 The next period to the one for which final felling and thinning probability are to be calculated.
 }
 \item{...}{
+  Further arguments
 }
 
   \item{region}{

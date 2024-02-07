@@ -25,9 +25,8 @@ A growth function should calculate both dbh and height increment. This
   function calls two functions, defined in \emph{functions} as \emph{fn.dbh.inc} and \emph{fn.hgt.in}c to  estimate those.
 }
 \value{
-  A data frame with two elements
-  {dbh.inc.mm } {DBH increment in mm}
-  {hgt.inc.dm } {Height increment in dm}
+  Returns a data frame with two elements dbh.inc.mm (DBH increment in
+  mm), hgt.inc.dm (Height increment in dm)-
 }
 
 \author{

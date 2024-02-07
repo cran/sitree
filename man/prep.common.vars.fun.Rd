@@ -37,7 +37,8 @@ Length of the periods, in years.
   \item{n.periods}{
 Number of periods.
 }
-  \item{\dots}{
+\item{\dots}{
+  Further arguments, data, etc.
 }
 }
 \details{

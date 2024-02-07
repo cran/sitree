@@ -24,7 +24,11 @@ A trList object
   \item{fl}{
 A list describing the plot information
 }
-  \item{common.vars}{
+\item{common.vars}{
+  A list with at least 3 elements: a vector named SBA.m2.ha, stand basal
+  area in m2; a data frame named pr.spp.ba, with the percentatge of
+  basal area by species with column names spru, pine, birch, and other,
+  and a vector named i.tree with the stands corresponding to each tree.
 }
   \item{i.period}{
 The number of period (from 0 to nperiods) for which to calculate recruitment.
